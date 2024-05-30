@@ -1,0 +1,6 @@
+.git
+*.pyc
+__pycache__
+ec2-plus-tools/.terraform/ 
+ec2-plus-tools/.terraform.lock.hcl
+ec2-plus-tools/terraform.tfstate
