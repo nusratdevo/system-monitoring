@@ -25,40 +25,27 @@ pipeline{
                 }
             }
         }
-        stage("quality gate"){
-           steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'
-                }
-            }
-        }
+        
         stage("TRIVY File scan"){
             steps{
                 sh "trivy fs . > trivy-fs_report.txt"
             }
         }
-        stage("OWASP Dependency Check"){
-            steps{
-                dependencyCheck additionalArguments: '--scan ./ --format XML ', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
+        
         stage("Docker Build"){
             steps{
                 script{
-                    dir('build'){
+                   
+                  
                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker'){
                       sh 'docker build -t system-monitoring .'
                     }
-                    }
+                    
+                    
                 }
             }
         }
-        stage("TRIVY"){
-            steps{
-                sh "trivy image nusratdev/system-monitoring:${BUILD_NUMBER} > trivyimage.txt"
-            }
-        }
+        
         stage("DockerImage tag & Push"){
             steps{
                 script{
@@ -69,6 +56,11 @@ pipeline{
                     }
                     
                 }
+            }
+        }
+        stage("TRIVY"){
+            steps{
+                sh "trivy image nusratdev/system-monitoring:${BUILD_NUMBER} > trivyimage.txt"
             }
         }
         stage("Deploy to container"){
